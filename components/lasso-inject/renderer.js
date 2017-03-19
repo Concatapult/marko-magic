@@ -8,11 +8,20 @@ module.exports = function(input, out) {
     var lassoRenderContext = getLassoRenderContext(out);
     var lassoPageResultAsyncValue = lassoRenderContext.data.lassoPageResult;
     var template = out.global.template;
+    var cacheKey = template.path;
+    var dependencies;
 
     if (!lassoPageResultAsyncValue) {
+        dependencies = template.getDependencies();
+
+        if(out.global.dependencies) {
+            dependencies = dependencies.concat(out.global.dependencies);
+            cacheKey += out.global.dependenciesCacheKey || Math.random();
+        }
+
         lassoPageTag({
-            dependencies: template.getDependencies(),
-            filename: template.path,
+            dependencies: dependencies,
+            cacheKey: cacheKey,
             dirname: path.dirname(template.path)
         }, out);
     }
